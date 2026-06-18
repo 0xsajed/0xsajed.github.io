@@ -20,13 +20,41 @@ nav a {
   font-size: 20px;
 }
 
-h1 {
-	color: #d4d4d4;
-	padding: 20px;
-}
-
 a:hover {
   color: #7c5e7b;
   transition-duration: 0.5s;
   
+}
+
+h1 {
+	color: #d4d4d4;
+	padding: 20px;
+  text-align: center;
+}
+
+h2 {
+  color: #d4d4d4
+}
+
+p {
+  color: #d4d4d4;
+}
+
+
+
+.projects {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.project {
+  background-color: #344244;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.project h2 {
+  margin-top: 0;
 }
