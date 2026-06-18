@@ -1,13 +1,31 @@
+body {
+  font-family: "Georgia", serif;
+  background-color: #1b1e2f;
+	margin: 0px;
+	padding: 0px;
+}
+
 nav {
-  background-color: #212121;
+  background-color: #111111;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 nav a {
   float: left;
-  color: #c0a9a9;
+  color: #d4d4d4;
   text-align: center;
-  padding: 16px 16px;
+  padding: 20px 16px;
   text-decoration: none;
-  font-size: 20px;
+  font-size: 25px;
+}
+
+nav div {
+	text-align: center;
+}
+
+h1 {
+	color: #d4d4d4;
+	padding: 20px;
 }
