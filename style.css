@@ -1,12 +1,12 @@
 body {
   font-family: "Georgia", serif;
-  background-color: #1b1e2f;
+  background-color: #000000;
 	margin: 0px;
 	padding: 0px;
 }
 
 nav {
-  background-color: #111111;
+  background-color: #000000;
   overflow: hidden;
   justify-content: center;
 }
