@@ -111,6 +111,13 @@ scene.add(ambientLight);
     );
 
     controls.target.set(0, 0, 0);
+
+    // Adds momentum when the cube view is spun.
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.04;
+    controls.rotateSpeed = 0.8;
+
+
     controls.update();
 
     // Responsive canvas
