@@ -1,9 +1,11 @@
 let cubeViewer;
 let cubeState;
+let centerOrientation;
 let controlsLocked = false;
 
 const SCRAMBLE_LENGTH = 20;
 const MOVE_DURATION = 600;
+const CENTER_MOVE_DURATION = 100;
 
 
 function generateScramble(length = SCRAMBLE_LENGTH) {
@@ -49,6 +51,7 @@ async function start() {
                 
 
         cubeState = new Cube();
+        centerOrientation = createCenterOrientationState();
         Cube.initSolver();
 
         console.log("Cube loaded and CubeJS initialised.");
@@ -71,11 +74,15 @@ async function start() {
         const resetButton =
             document.getElementById("resetButton");
 
+        const wireframeButton =
+            document.getElementById("wireframeButton");
+
         const actionButtons = [
             executeButton,
             scrambleButton,
             solveButton,
-            resetButton
+            resetButton,
+            wireframeButton
         ];
 
 
@@ -91,14 +98,41 @@ async function start() {
         }
 
 
-        async function animateAndSync(sequence) {
+        function updateWireframeButton() {
+            const enabled = cubeViewer.wireframeEnabled;
+
+            wireframeButton.textContent =
+                `Wireframe: ${enabled ? "On" : "Off"}`;
+
+            wireframeButton.setAttribute(
+                "aria-pressed",
+                String(enabled)
+            );
+        }
+
+
+        async function animateAndSync(
+            sequence,
+            duration = MOVE_DURATION
+        ) {
             return animateSequence(
                 cubeViewer,
                 sequence,
-                MOVE_DURATION,
+                duration,
                 function (completedMove) {
                     cubeState.move(completedMove);
+                    applyMoveToCenterOrientation(
+                        centerOrientation,
+                        completedMove
+                    );
                 }
+            );
+        }
+
+
+        function isMastermorphixLoaded() {
+            return cubeViewer.modelPath.includes(
+                "mastermorphix"
             );
         }
 
@@ -143,6 +177,22 @@ async function start() {
         );
 
 
+        // Wireframe
+        wireframeButton.addEventListener(
+            "click",
+            function () {
+                const enabled =
+                    toggleCubeWireframe(cubeViewer);
+
+                updateWireframeButton();
+
+                solutionOutput.textContent = enabled
+                    ? "Wireframe mode enabled."
+                    : "Wireframe mode disabled.";
+            }
+        );
+
+
         cubeSelect.addEventListener(
             "change",
             function () {
@@ -171,6 +221,8 @@ async function start() {
 
                     // Every newly loaded model begins solved.
                     cubeState = new Cube();
+                    centerOrientation =
+                        createCenterOrientationState();
 
                     movesInput.value = "";
                     solutionOutput.textContent =
@@ -210,27 +262,68 @@ async function start() {
             "click",
             function () {
                 runLocked(async function () {
-                    if (cubeState.isSolved()) {
+                    const solveMastermorphixCenters =
+                        isMastermorphixLoaded();
+
+                    if (
+                        cubeState.isSolved() &&
+                        (
+                            !solveMastermorphixCenters ||
+                            isCenterOrientationSolved(
+                                centerOrientation
+                            )
+                        )
+                    ) {
                         solutionOutput.textContent =
                             "The cube is already solved.";
                         return;
                     }
 
-                    const solution =
-                        cubeState.solve().trim();
+                    const completedSolution = [];
 
-                    if (solution === "") {
-                        throw new Error(
-                            "CubeJS returned an empty solution."
-                        );
+                    if (!cubeState.isSolved()) {
+                        const solution =
+                            cubeState.solve().trim();
+
+                        if (solution === "") {
+                            throw new Error(
+                                "CubeJS returned an empty solution."
+                            );
+                        }
+
+                        movesInput.value = solution;
+                        solutionOutput.textContent =
+                            "Solution: " + solution;
+
+                        const moves =
+                            await animateAndSync(solution);
+
+                        completedSolution.push(...moves);
                     }
 
-                    movesInput.value = solution;
-                    solutionOutput.textContent =
-                        "Solving...";
+                    if (
+                        solveMastermorphixCenters &&
+                        !isCenterOrientationSolved(
+                            centerOrientation
+                        )
+                    ) {
+                        const centerSolution =
+                            buildMastermorphixCenterSolution(
+                                centerOrientation
+                            );
 
-                    const moves =
-                        await animateAndSync(solution);
+                        solutionOutput.textContent =
+                        "Solution: " +
+                        [...completedSolution, ...centerSolution].join(" ");
+
+                        const centerMoves =
+                            await animateAndSync(
+                                centerSolution.join(" "),
+                                CENTER_MOVE_DURATION
+                            );
+
+                        completedSolution.push(...centerMoves);
+                    }
 
                     if (!cubeState.isSolved()) {
                         throw new Error(
@@ -238,8 +331,23 @@ async function start() {
                         );
                     }
 
+                    if (
+                        solveMastermorphixCenters &&
+                        !isCenterOrientationSolved(
+                            centerOrientation
+                        )
+                    ) {
+                        throw new Error(
+                            "The Mastermorphix centres are still misoriented."
+                        );
+                    }
+
+                    const fullSolution =
+                        completedSolution.join(" ");
+
+                    movesInput.value = fullSolution;
                     solutionOutput.textContent =
-                        "Solution: " + moves.join(" ");
+                        "Solution: " + fullSolution;
 
                     console.log(
                         "CubeJS solved:",
@@ -259,6 +367,8 @@ async function start() {
 
                     // Discard the scrambled CubeJS state.
                     cubeState = new Cube();
+                    centerOrientation =
+                        createCenterOrientationState();
 
                     movesInput.value = "";
                     solutionOutput.textContent = "Cube reset.";

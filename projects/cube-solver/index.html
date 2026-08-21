@@ -48,20 +48,33 @@
 
 <label for="cubeSelect">Choose cube</label>
 
-<select id="cubeSelect" class="form-select mb-3">
-  <option value="models/regular.glb">3×3 Cube</option>
-  <option value="models/mirror.glb">Mirror Cube</option>
-  <option value="models/mastermorphix.glb">Mastermorphix</option>
-</select>
+<div class="container mt-3">
+  <div style="width: 100%; max-width: 300px;">
+    <label for="cubeSelect" class="form-label">Choose cube</label>
+
+    <select id="cubeSelect" class="form-select">
+      <option value="models/regular.glb">3×3 Cube</option>
+      <option value="models/mirror.glb">Mirror Cube</option>
+      <option value="models/mastermorphix.glb">Mastermorphix</option>
+    </select>
+  </div>
+</div>
 
     <main class="container">
       <section>
         <div class="row">
           <div class="col-12">
             <h1>3D Cube Viewer</h1>
-            <div id="cube-viewer">
-              <canvas id="cubeCanvas" ></canvas>
-            </div>
+              <div
+                id="cube-viewer"
+                class="mx-auto"
+                style="width: 100%; max-width: 600px;"
+              >
+                <canvas
+                  id="cubeCanvas"
+                  style="display: block; width: 100%;"
+                ></canvas>
+              </div>
           </div>
         </div>
       </section>
@@ -76,17 +89,24 @@
         </div>
 
         <div class="row">
-          <div class="col-sm-3">
+          <div class="col-sm">
             <button id="executeButton" type="button">Execute</button>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm">
             <button id="scrambleButton" type="button">Scramble</button>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm">
             <button id="solveButton" type="button">Solve</button>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm">
             <button id="resetButton"  type="button">Reset</button>
+          </div>
+          <div class="col-sm">
+            <button
+              id="wireframeButton"
+              type="button"
+              aria-pressed="false"
+            >Wireframe: Off</button>
           </div>
         </div>
       </section>
@@ -114,6 +134,7 @@
 
 <script src="cube-viewer.js"></script>
 <script src="cube-animation.js"></script>
+<script src="mastermorphix-solver.js"></script>
 <script src="main.js"></script>
   </body>
 </html>

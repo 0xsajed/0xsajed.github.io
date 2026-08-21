@@ -13,12 +13,27 @@ function createModelViewer(canvasId, modelPath) {
 
 
     // Lighting
-    const light = new THREE.DirectionalLight(0xffffff, 2);
-    light.position.set(0, 5, 5);
-    scene.add(light);
+    const hemisphereLight = new THREE.HemisphereLight(
+        0xffffff,
+        0x777777,
+        0.8
+    );
+    scene.add(hemisphereLight);
 
-    const ambient = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(ambient);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    keyLight.position.set(8, 10, 10);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    fillLight.position.set(-8, 5, -8);
+    scene.add(fillLight);
+
+    const lowerLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    lowerLight.position.set(2, -10, 6);
+    scene.add(lowerLight);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
+    scene.add(ambientLight);
 
 
     // Canvas and renderer
@@ -29,6 +44,8 @@ function createModelViewer(canvasId, modelPath) {
         antialias: true
     });
 
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Set canvas size
     function resize() {
@@ -47,7 +64,39 @@ function createModelViewer(canvasId, modelPath) {
     const loader = new THREE.GLTFLoader();
 
     loader.load(modelPath, function(gltf) {
-        scene.add(gltf.scene);
+        const model = gltf.scene;
+
+        if (modelPath.includes("mirror")) {
+            model.traverse(function(object) {
+                if (!object.isMesh) {
+                    return;
+                }
+
+                const materials = Array.isArray(object.material)
+                    ? object.material
+                    : [object.material];
+
+                materials.forEach(function(material) {
+                    if (!material) {
+                        return;
+                    }
+
+                    material.color.set(0x777777);
+
+                    if ("metalness" in material) {
+                        material.metalness = 0.85;
+                    }
+
+                    if ("roughness" in material) {
+                        material.roughness = 0.12;
+                    }
+
+                    material.needsUpdate = true;
+                });
+            });
+        }
+
+        scene.add(model);
     });
 
 

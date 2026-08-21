@@ -1,3 +1,44 @@
+function applyWireframeToObject(root, enabled) {
+    root.traverse(function (object) {
+        if (!object.isMesh) {
+            return;
+        }
+
+        const materials = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
+
+        materials.forEach(function (material) {
+            if (!material) {
+                return;
+            }
+
+            material.wireframe = enabled;
+            material.needsUpdate = true;
+        });
+    });
+}
+
+
+function setCubeWireframe(viewer, enabled) {
+    viewer.wireframeEnabled = Boolean(enabled);
+    applyWireframeToObject(
+        viewer.model,
+        viewer.wireframeEnabled
+    );
+
+    return viewer.wireframeEnabled;
+}
+
+
+function toggleCubeWireframe(viewer) {
+    return setCubeWireframe(
+        viewer,
+        !viewer.wireframeEnabled
+    );
+}
+
+
 async function createCubeViewer(canvasId, modelPath) {
     const scene = new THREE.Scene();
 
@@ -11,20 +52,42 @@ async function createCubeViewer(canvasId, modelPath) {
     camera.position.set(15, 15, 13);
 
     // Lighting
-    const hemisphereLight = new THREE.HemisphereLight(
-        0xffffff,
-        0x222222,
-        0.6
-    );
-    scene.add(hemisphereLight);
+    // Lighting
+const hemisphereLight = new THREE.HemisphereLight(
+    0xffffff,
+    0x777777,
+    0.8
+);
+scene.add(hemisphereLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    keyLight.position.set(8, 10, 10);
-    scene.add(keyLight);
+const keyLight = new THREE.DirectionalLight(
+    0xffffff,
+    0.9
+);
+keyLight.position.set(8, 10, 10);
+scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xccccff, 0.25);
-    fillLight.position.set(-8, 4, -6);
-    scene.add(fillLight);
+const fillLight = new THREE.DirectionalLight(
+    0xffffff,
+    0.5
+);
+fillLight.position.set(-8, 5, -8);
+scene.add(fillLight);
+
+// Illuminates the bottom faces.
+const lowerLight = new THREE.DirectionalLight(
+    0xffffff,
+    0.4
+);
+lowerLight.position.set(2, -10, 6);
+scene.add(lowerLight);
+
+// Prevents faces pointing away from every light becoming black.
+const ambientLight = new THREE.AmbientLight(
+    0xffffff,
+    0.25
+);
+scene.add(ambientLight);
 
     // Canvas and renderer
     const canvas = document.getElementById(canvasId);
@@ -39,6 +102,7 @@ async function createCubeViewer(canvasId, modelPath) {
     });
 
     renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Mouse controls
     const controls = new THREE.OrbitControls(
@@ -67,27 +131,28 @@ async function createCubeViewer(canvasId, modelPath) {
     const gltf = await loader.loadAsync(modelPath);
     const model = gltf.scene;
 
+if (modelPath.includes("mirror")) {
     model.traverse(function (object) {
-    if (!object.isMesh) {
-        return;
-    }
-
-    const materials = Array.isArray(object.material)
-        ? object.material
-        : [object.material];
-
-    materials.forEach(function (material) {
-        if (!material) {
+        if (!object.isMesh) {
             return;
         }
 
-        // A visible silver appearance without requiring an HDR environment.
-        material.color.set(0xaaaaaa);
-        material.metalness = 0.35;
-        material.roughness = 0.3;
-        material.needsUpdate = true;
+        const materials = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
+
+        materials.forEach(function (material) {
+            if (!material) {
+                return;
+            }
+
+            material.color.set(0x777777);
+            material.metalness = 0.85;
+            material.roughness = 0.12;
+            material.needsUpdate = true;
+        });
     });
-});
+}
 
     scene.add(model);
 
@@ -153,7 +218,8 @@ async function createCubeViewer(canvasId, modelPath) {
         model,
         cubies,
         initialCubieStates,
-        modelPath
+        modelPath,
+        wireframeEnabled: false
     };
 }
 
@@ -208,9 +274,9 @@ async function replaceCubeModel(viewer, modelPath) {
                 return;
             }
 
-            material.color.set(0xaaaaaa);
-            material.metalness = 0.35;
-            material.roughness = 0.3;
+            material.color.set(0x777777);
+            material.metalness = 0.85;
+            material.roughness = 0.12;
             material.needsUpdate = true;
         });
     });
@@ -244,6 +310,11 @@ async function replaceCubeModel(viewer, modelPath) {
 
     viewer.scene.remove(viewer.model);
     viewer.scene.add(newModel);
+
+    applyWireframeToObject(
+        newModel,
+        viewer.wireframeEnabled
+    );
 
     const initialCubieStates = cubies.map(function (cubie) {
         return {
