@@ -1,0 +1,16 @@
+MOVE_METRIC = {QTM, HTM, OBTM}
+STARTING_COLOURS \subset {Yellow, White, Blue, Green, Red, Orange}
+
+CFOP (humanistic):
+
+1. CROSS:
+    run a search algorithm to determine an 8 move solution.
+
+2. F2L:
+
+
+
+3. OLL:
+    recognize cases
+
+4. PLL
