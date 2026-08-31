@@ -4,7 +4,7 @@ STARTING_COLOURS \subset {Yellow, White, Blue, Green, Red, Orange}
 CFOP (humanistic):
 
 1. CROSS:
-    run a search algorithm to determine an 8 move solution.
+    run a search algorithm to determine an 8 move solution; add an option for an XCROSS if more efficient.
 
 2. F2L:
 
@@ -14,3 +14,6 @@ CFOP (humanistic):
     recognize cases
 
 4. PLL
+
+Sources:
+- https://www.cubezone.be/crossstudy.html
