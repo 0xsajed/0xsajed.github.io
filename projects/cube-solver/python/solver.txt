@@ -12,8 +12,11 @@ CFOP (humanistic):
 
 3. OLL:
     recognize cases
+    execute cases
 
-4. PLL
+4. PLL:
+
+5. AUF
 
 Sources:
 - https://www.cubezone.be/crossstudy.html
