@@ -133,7 +133,7 @@ def rotate(v, axis, quarter_turns):
 
     for i in range(quarter_turns):
         v = rotate_once(v, axis)
-
+ 
     return v
 
 
