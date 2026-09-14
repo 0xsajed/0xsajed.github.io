@@ -1,15 +1,19 @@
 import streamlit as st
 import torch
 from PIL import Image
+from pathlib import Path
 
 from model import ConvNet
 from transforms import transform_image
 from class_names import class_names
 
+MODEL_PATH = Path(__file__).resolve().parent / "model.pth"
+
+
 @st.cache_resource
 def load_model():
     model = ConvNet()
-    model = torch.load("model.pth", map_location="cpu", weights_only=False)
+    model = torch.load(MODEL_PATH, map_location="cpu", weights_only=False)
     model.eval()
     return model
 
