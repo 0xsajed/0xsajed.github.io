@@ -74,5 +74,74 @@ def build_facelets():
 
     return specs
 
-
 FACELETS = build_facelets()
+
+# this function rotates a vector, v, by +90 degrees around the given axis in 3d linear space
+def rotate_once(v, axis):
+    
+    x, y, z = v
+
+    if axis == 0:  # x axis
+        return (x, -z, y)
+
+    if axis == 1:  # y axis
+        return (z, y, -x)
+
+    if axis == 2: # z axis
+        return (-y, x, z)
+
+    raise ValueError(f"Invalid axis: {axis}")
+
+
+# this is a wrapper around rotate once that executes multple rotations
+def rotate(v, axis, quarter_turns):
+    
+    # find the number of quarter turns mod(4)
+    quarter_turns %= 4
+
+    for i in range(quarter_turns):
+        v = rotate_once(v, axis)
+ 
+    return v
+
+
+MOVE_DEFS = {
+    # face: axis, layer, clockwise turn direction
+    "R": (0, 1, -1),
+    "L": (0, -1, 1),
+    "U": (1, 1, -1),
+    "D": (1, -1, 1),
+    "F": (2, 1, -1),
+    "B": (2, -1, 1),
+}
+
+def parse_move(move):
+    
+    if not move:
+        raise ValueError("no move")
+
+    face = move[0]
+    suffix = move[1:]
+
+    if face not in MOVE_DEFS:
+        raise ValueError(f"Invalid move face: {face}")
+
+    if suffix == "":
+        amount = 1
+    elif suffix == "2":
+        amount = 2
+    elif suffix == "'":
+        amount = 3
+    else:
+        raise ValueError(f"Invalid move suffix in move {move!r}")
+
+    return face, amount
+
+# convert a 54 character cube string into a sticker dictionary.
+def cube_string_to_stickers(cube):
+    pass # to do
+
+def apply_move(cube, move):
+    """Apply one move to a Kociemba cube string.
+    Example:
+        cube = apply_move(cube, "R")"""
