@@ -10,3 +10,4 @@ class_names = [
     "ship",
     "truck"
 ]
+
