@@ -12,3 +12,7 @@
   object-fit: cover;
   border-radius: 8px;
 }
+
+body {
+  font-family: "Times New Roman", Times, serif;
+}
